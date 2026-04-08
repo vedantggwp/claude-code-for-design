@@ -1,0 +1,621 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Loading... — Claude Code for Design</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Poppins:wght@200;300;400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+<style>
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+:root {
+  --sp-navy:       #16254c;
+  --sp-teal:       #00a5ac;
+  --sp-teal-soft:  #e6f7f8;
+  --sp-blue:       #1549f4;
+  --sp-cream:      #fdf6ec;
+  --sp-page-bg:    #f7fafc;
+  --sp-white:      #ffffff;
+  --sp-text:       #16254c;
+  --sp-text-muted: #5a6a7a;
+  --sp-border:     #e2e8f0;
+
+  --font-display:  'Poppins', system-ui, sans-serif;
+  --font-mono:     'IBM Plex Mono', monospace;
+
+  --text-xs:    0.8rem;
+  --text-sm:    0.875rem;
+  --text-base:  1rem;
+  --text-lg:    1.125rem;
+  --text-xl:    1.3rem;
+  --text-2xl:   1.65rem;
+  --text-3xl:   2.2rem;
+
+  --radius-sm:  6px;
+  --radius-md:  10px;
+  --radius-full: 999px;
+
+  --shadow-sm:  0 1px 3px rgba(22,37,76,0.06);
+  --shadow-md:  0 4px 16px rgba(22,37,76,0.08);
+
+  --transition: 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  --max-w:      780px;
+  --max-w-wide: 1120px;
+}
+
+html { scroll-behavior: smooth; }
+
+body {
+  font-family: var(--font-display);
+  color: var(--sp-text);
+  background: var(--sp-page-bg);
+  -webkit-font-smoothing: antialiased;
+  line-height: 1.6;
+}
+
+a { color: var(--sp-teal); text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+/* ── NAV ── */
+.nav {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  z-index: 100;
+  background: rgba(247,250,252,0.85);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border-bottom: 1px solid var(--sp-border);
+}
+
+.nav-inner {
+  max-width: var(--max-w-wide);
+  margin: 0 auto;
+  padding: 0 clamp(1.25rem, 4vw, 3rem);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 64px;
+}
+
+.nav-brand {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  font-weight: 600;
+  font-size: var(--text-sm);
+  color: var(--sp-text);
+  text-decoration: none;
+}
+
+.nav-brand:hover { text-decoration: none; }
+
+.nav-brand .dot {
+  width: 10px; height: 10px;
+  border-radius: 50%;
+  background: var(--sp-teal);
+}
+
+.nav-links {
+  display: flex;
+  gap: 2rem;
+  list-style: none;
+  font-size: var(--text-sm);
+  color: var(--sp-text-muted);
+}
+
+.nav-links a { color: var(--sp-text-muted); }
+.nav-links a:hover { color: var(--sp-teal); text-decoration: none; }
+
+/* ── LAYOUT ── */
+.page-wrap {
+  max-width: var(--max-w-wide);
+  margin: 0 auto;
+  padding: 96px clamp(1.25rem, 4vw, 3rem) 3rem;
+  display: grid;
+  grid-template-columns: 220px 1fr;
+  gap: 4rem;
+}
+
+@media (max-width: 900px) {
+  .page-wrap { grid-template-columns: 1fr; gap: 1.5rem; }
+  .sidebar { display: none; }
+}
+
+/* ── SIDEBAR ── */
+.sidebar {
+  position: sticky;
+  top: 96px;
+  align-self: start;
+  max-height: calc(100vh - 120px);
+  overflow-y: auto;
+}
+
+.sidebar-section { margin-bottom: 2rem; }
+
+.sidebar-label {
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--sp-text-muted);
+  margin-bottom: 0.6rem;
+}
+
+.sidebar-list { list-style: none; }
+
+.sidebar-list li {
+  margin-bottom: 0.25rem;
+}
+
+.sidebar-list a {
+  display: block;
+  padding: 4px 10px;
+  font-size: var(--text-xs);
+  color: var(--sp-text-muted);
+  border-radius: var(--radius-sm);
+  transition: all var(--transition);
+  line-height: 1.5;
+}
+
+.sidebar-list a:hover {
+  color: var(--sp-teal);
+  background: var(--sp-teal-soft);
+  text-decoration: none;
+}
+
+.sidebar-list a.active {
+  color: var(--sp-teal);
+  background: var(--sp-teal-soft);
+  font-weight: 500;
+}
+
+/* ── BREADCRUMB ── */
+.breadcrumb {
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  color: var(--sp-text-muted);
+  margin-bottom: 1.5rem;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.breadcrumb a { color: var(--sp-text-muted); }
+.breadcrumb a:hover { color: var(--sp-teal); }
+.breadcrumb .sep { opacity: 0.4; }
+
+/* ── ARTICLE META ── */
+.article-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-bottom: 2.5rem;
+  padding-bottom: 1.5rem;
+  border-bottom: 1px solid var(--sp-border);
+}
+
+.meta-tag {
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  font-weight: 500;
+  padding: 3px 10px;
+  border-radius: var(--radius-full);
+  background: var(--sp-teal-soft);
+  color: var(--sp-teal);
+}
+
+.meta-date {
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  color: var(--sp-text-muted);
+  padding: 3px 10px;
+  border: 1px solid var(--sp-border);
+  border-radius: var(--radius-full);
+}
+
+/* ── ARTICLE CONTENT ── */
+.article {
+  max-width: var(--max-w);
+  min-width: 0;
+}
+
+.article-content h1 {
+  font-size: var(--text-3xl);
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  line-height: 1.15;
+  margin-bottom: 1rem;
+}
+
+.article-content h2 {
+  font-size: var(--text-xl);
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  margin-top: 2.5rem;
+  margin-bottom: 0.75rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid var(--sp-border);
+}
+
+.article-content h3 {
+  font-size: var(--text-lg);
+  font-weight: 600;
+  margin-top: 2rem;
+  margin-bottom: 0.5rem;
+}
+
+.article-content p {
+  margin-bottom: 1rem;
+  line-height: 1.75;
+  color: #2d3748;
+}
+
+.article-content ul, .article-content ol {
+  margin-bottom: 1rem;
+  padding-left: 1.5rem;
+}
+
+.article-content li {
+  margin-bottom: 0.4rem;
+  line-height: 1.65;
+  color: #2d3748;
+}
+
+.article-content strong { color: var(--sp-navy); }
+
+.article-content code {
+  font-family: var(--font-mono);
+  font-size: 0.88em;
+  padding: 2px 6px;
+  background: #f1f5f9;
+  border-radius: 4px;
+  color: var(--sp-navy);
+}
+
+.article-content pre {
+  margin-bottom: 1.25rem;
+  padding: 1.25rem 1.5rem;
+  background: var(--sp-navy);
+  border-radius: var(--radius-md);
+  overflow-x: auto;
+  line-height: 1.55;
+}
+
+.article-content pre code {
+  background: none;
+  padding: 0;
+  color: #e2e8f0;
+  font-size: 0.85rem;
+}
+
+.article-content table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 1.25rem;
+  font-size: var(--text-sm);
+}
+
+.article-content th {
+  text-align: left;
+  font-weight: 600;
+  font-size: var(--text-xs);
+  font-family: var(--font-mono);
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--sp-text-muted);
+  padding: 0.6rem 1rem;
+  border-bottom: 2px solid var(--sp-border);
+}
+
+.article-content td {
+  padding: 0.6rem 1rem;
+  border-bottom: 1px solid #f1f5f9;
+  color: #2d3748;
+  line-height: 1.5;
+}
+
+.article-content tr:hover td { background: #fafbfd; }
+
+.article-content blockquote {
+  margin-bottom: 1rem;
+  padding: 0.75rem 1.25rem;
+  border-left: 3px solid var(--sp-teal);
+  background: var(--sp-teal-soft);
+  border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+  color: var(--sp-text);
+}
+
+.article-content blockquote p { margin-bottom: 0; }
+
+.article-content em { color: var(--sp-text-muted); }
+
+.article-content a {
+  color: var(--sp-teal);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.article-content hr {
+  border: none;
+  border-top: 1px solid var(--sp-border);
+  margin: 2rem 0;
+}
+
+/* ── LOADING ── */
+.loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 50vh;
+  font-size: var(--text-sm);
+  color: var(--sp-text-muted);
+}
+
+.loading-dot {
+  display: inline-block;
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  background: var(--sp-teal);
+  margin-right: 0.75rem;
+  animation: pulse 1s ease infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 0.3; transform: scale(0.85); }
+  50% { opacity: 1; transform: scale(1); }
+}
+
+/* ── ERROR ── */
+.error-wrap {
+  text-align: center;
+  padding: 4rem 2rem;
+}
+
+.error-wrap h1 {
+  font-size: var(--text-2xl);
+  margin-bottom: 0.75rem;
+}
+
+.error-wrap p {
+  color: var(--sp-text-muted);
+  margin-bottom: 1.5rem;
+}
+
+.btn-home {
+  display: inline-block;
+  padding: 10px 24px;
+  background: var(--sp-teal);
+  color: var(--sp-white);
+  border-radius: var(--radius-full);
+  font-weight: 500;
+  font-size: var(--text-sm);
+  transition: all var(--transition);
+}
+
+.btn-home:hover { background: #009199; text-decoration: none; }
+
+/* ── FOOTER ── */
+.footer {
+  max-width: var(--max-w-wide);
+  margin: 0 auto;
+  padding: 2rem clamp(1.25rem, 4vw, 3rem);
+  border-top: 1px solid var(--sp-border);
+  font-size: var(--text-xs);
+  color: var(--sp-text-muted);
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.footer a { color: var(--sp-text-muted); }
+.footer a:hover { color: var(--sp-teal); }
+.footer-links { display: flex; gap: 1.5rem; list-style: none; }
+</style>
+</head>
+<body>
+
+<nav class="nav">
+  <div class="nav-inner">
+    <a href="index.html" class="nav-brand">
+      <span class="dot"></span>
+      Claude Code for Design
+    </a>
+    <ul class="nav-links">
+      <li><a href="page.html?p=wiki/index.md">Index</a></li>
+      <li><a href="page.html?p=wiki/overview.md">Overview</a></li>
+      <li><a href="index.html">Home</a></li>
+    </ul>
+  </div>
+</nav>
+
+<main class="page-wrap" id="pageWrap">
+  <!-- Sidebar injected by JS -->
+  <aside class="sidebar" id="sidebar"></aside>
+  <div class="article" id="articleWrap">
+    <div class="loading" id="loading">
+      <span class="loading-dot"></span> Loading article...
+    </div>
+  </div>
+</main>
+
+<footer class="footer">
+  <span>Claude Code for Design &middot; Springpod</span>
+  <ul class="footer-links">
+    <li><a href="page.html?p=wiki/index.md">Full Index</a></li>
+    <li><a href="page.html?p=wiki/overview.md">Overview</a></li>
+    <li><a href="index.html">Home</a></li>
+  </ul>
+</footer>
+
+<script>
+// ── ARTICLE REGISTRY (for sidebar navigation) ──
+const registry = {
+  figma: [
+    { title: "Figma MCP Server", path: "wiki/figma/figma-mcp-server.md" },
+    { title: "Code Connect", path: "wiki/figma/code-connect.md" },
+    { title: "Code to Canvas", path: "wiki/figma/code-to-canvas.md" }
+  ],
+  tools: [
+    { title: "Frontend Design Plugin", path: "wiki/tools/frontend-design-plugin.md" },
+    { title: "Distributional Convergence", path: "wiki/tools/distributional-convergence.md" }
+  ],
+  workflows: [
+    { title: "Figma to Code", path: "wiki/workflows/figma-to-code.md" },
+    { title: "Best Practices", path: "wiki/workflows/claude-code-best-practices.md" }
+  ],
+  meta: [
+    { title: "Index", path: "wiki/index.md" },
+    { title: "Overview", path: "wiki/overview.md" }
+  ]
+};
+
+// ── GET PAGE PATH FROM URL ──
+const params = new URLSearchParams(window.location.search);
+const pagePath = params.get('p');
+
+if (!pagePath) {
+  showError("No page specified", "Choose an article from the wiki.");
+} else {
+  loadPage(pagePath);
+}
+
+// ── BUILD SIDEBAR ──
+function buildSidebar(currentPath) {
+  const sidebar = document.getElementById('sidebar');
+  let html = '';
+
+  for (const [section, items] of Object.entries(registry)) {
+    const label = section.charAt(0).toUpperCase() + section.slice(1);
+    html += '<div class="sidebar-section">';
+    html += '<p class="sidebar-label">' + label + '</p>';
+    html += '<ul class="sidebar-list">';
+    for (const item of items) {
+      const active = item.path === currentPath ? ' active' : '';
+      html += '<li><a href="page.html?p=' + item.path + '" class="' + active + '">' + item.title + '</a></li>';
+    }
+    html += '</ul></div>';
+  }
+
+  sidebar.innerHTML = html;
+}
+
+// ── LOAD AND RENDER PAGE ──
+async function loadPage(path) {
+  buildSidebar(path);
+
+  try {
+    const resp = await fetch(path);
+    if (!resp.ok) throw new Error('Not found');
+    const raw = await resp.text();
+
+    // Parse frontmatter
+    const { frontmatter, content } = parseFrontmatter(raw);
+
+    // Process wiki cross-references: [[topic/slug]] → links
+    const processed = content.replace(
+      /\[\[([^\]]+)\]\]/g,
+      (match, ref) => {
+        const slug = ref.includes('/') ? ref : ref;
+        const mdPath = 'wiki/' + slug + '.md';
+        const label = slug.split('/').pop().replace(/-/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
+        return '[' + label + '](page.html?p=' + mdPath + ')';
+      }
+    );
+
+    // Render markdown
+    let html = marked.parse(processed);
+
+    // Rewrite relative .md links to use page.html renderer
+    // Handles links like: href="figma/figma-mcp-server.md" or href="../tools/foo.md"
+    const currentDir = path.substring(0, path.lastIndexOf('/') + 1);
+    html = html.replace(
+      /href="(?!https?:\/\/|page\.html|index\.html|mailto:|#)([^"]*\.md)"/g,
+      (match, relPath) => {
+        // Resolve relative path against current page directory
+        let resolved;
+        if (relPath.startsWith('../')) {
+          // Go up from current dir
+          const parent = currentDir.substring(0, currentDir.slice(0, -1).lastIndexOf('/') + 1);
+          resolved = parent + relPath.replace('../', '');
+        } else if (relPath.startsWith('/')) {
+          resolved = relPath.slice(1);
+        } else {
+          resolved = currentDir + relPath;
+        }
+        return 'href="page.html?p=' + resolved + '"';
+      }
+    );
+
+    // Build breadcrumb
+    const parts = path.replace('wiki/', '').replace('.md', '').split('/');
+    let breadcrumb = '<a href="index.html">Home</a> <span class="sep">/</span> ';
+    if (parts.length > 1) {
+      breadcrumb += '<a href="page.html?p=wiki/index.md">' + parts[0] + '</a> <span class="sep">/</span> ';
+    }
+    breadcrumb += '<span>' + (frontmatter.title || parts[parts.length - 1]) + '</span>';
+
+    // Build meta tags
+    let metaHtml = '';
+    if (frontmatter.tags && frontmatter.tags.length) {
+      metaHtml += frontmatter.tags.map(t => '<span class="meta-tag">' + t + '</span>').join('');
+    }
+    if (frontmatter.updated) {
+      metaHtml += '<span class="meta-date">Updated ' + frontmatter.updated + '</span>';
+    }
+
+    // Inject
+    const wrap = document.getElementById('articleWrap');
+    wrap.innerHTML =
+      '<nav class="breadcrumb">' + breadcrumb + '</nav>' +
+      (metaHtml ? '<div class="article-meta">' + metaHtml + '</div>' : '') +
+      '<div class="article-content">' + html + '</div>';
+
+    // Update title
+    document.title = (frontmatter.title || 'Article') + ' — Claude Code for Design';
+
+  } catch (e) {
+    showError("Article not found", "Could not load " + path);
+  }
+}
+
+// ── PARSE YAML FRONTMATTER ──
+function parseFrontmatter(text) {
+  const match = text.match(/^---\n([\s\S]*?)\n---\n([\s\S]*)$/);
+  if (!match) return { frontmatter: {}, content: text };
+
+  const fm = {};
+  const lines = match[1].split('\n');
+  for (const line of lines) {
+    const kv = line.match(/^(\w+):\s*(.+)$/);
+    if (!kv) continue;
+    let val = kv[2].trim();
+    // Parse arrays: [a, b, c]
+    if (val.startsWith('[') && val.endsWith(']')) {
+      val = val.slice(1, -1).split(',').map(s => s.trim().replace(/^['"]|['"]$/g, ''));
+    }
+    fm[kv[1]] = val;
+  }
+
+  return { frontmatter: fm, content: match[2] };
+}
+
+// ── ERROR STATE ──
+function showError(title, message) {
+  document.getElementById('loading')?.remove();
+  const wrap = document.getElementById('articleWrap');
+  wrap.innerHTML =
+    '<div class="error-wrap">' +
+      '<h1>' + title + '</h1>' +
+      '<p>' + message + '</p>' +
+      '<a href="index.html" class="btn-home">Back to Home</a>' +
+    '</div>';
+  buildSidebar('');
+}
+</script>
+</body>
+</html>

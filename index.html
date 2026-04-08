@@ -563,7 +563,7 @@ a { color: inherit; text-decoration: none; }
     <ul class="nav-links">
       <li><a href="#topics">Topics</a></li>
       <li><a href="#featured">Featured</a></li>
-      <li><a href="wiki/index.md">Full Index</a></li>
+      <li><a href="page.html?p=wiki/index.md">Full Index</a></li>
       <li><a href="intro-to-claude-code-for-design.html">Intro Deck</a></li>
     </ul>
   </div>
@@ -625,7 +625,7 @@ a { color: inherit; text-decoration: none; }
     <p class="section-sub">Each topic collects articles, workflows, and reference material. More articles are added as we ingest new sources.</p>
 
     <div class="topic-grid">
-      <a href="wiki/figma/figma-mcp-server.md" class="topic-card fade-in">
+      <a href="page.html?p=wiki/figma/figma-mcp-server.md" class="topic-card fade-in">
         <span class="topic-icon">&#9638;</span>
         <p class="topic-name">Figma</p>
         <p class="topic-scope">MCP server, Code Connect, design tokens, variables, component extraction</p>
@@ -655,13 +655,13 @@ a { color: inherit; text-decoration: none; }
         <p class="topic-scope">Tokens, component libraries, theme systems, accessibility, responsive</p>
         <p class="topic-count empty">Coming soon</p>
       </div>
-      <a href="wiki/tools/frontend-design-plugin.md" class="topic-card fade-in">
+      <a href="page.html?p=wiki/tools/frontend-design-plugin.md" class="topic-card fade-in">
         <span class="topic-icon">&#9874;</span>
         <p class="topic-name">Tools</p>
         <p class="topic-scope">CLIs, MCP servers, plugins, skills for design workflows</p>
         <p class="topic-count">2 articles</p>
       </a>
-      <a href="wiki/workflows/figma-to-code.md" class="topic-card fade-in">
+      <a href="page.html?p=wiki/workflows/figma-to-code.md" class="topic-card fade-in">
         <span class="topic-icon">&#10548;</span>
         <p class="topic-name">Workflows</p>
         <p class="topic-scope">End-to-end design patterns, tutorials, recipes combining multiple tools</p>
@@ -679,19 +679,19 @@ a { color: inherit; text-decoration: none; }
     <p class="section-sub">The highest-value articles in the wiki right now.</p>
 
     <div class="featured-grid">
-      <a href="wiki/workflows/figma-to-code.md" class="featured-card fade-in">
+      <a href="page.html?p=wiki/workflows/figma-to-code.md" class="featured-card fade-in">
         <p class="featured-topic">Workflow</p>
         <h3 class="featured-title">Figma to Code Workflow</h3>
         <p class="featured-desc">How Anthropic's Design team uses Claude Code &mdash; feeding Figma designs into autonomous coding loops. The reference workflow for 2&ndash;3x productivity.</p>
         <span class="featured-link">Read article &rarr;</span>
       </a>
-      <a href="wiki/tools/frontend-design-plugin.md" class="featured-card fade-in">
+      <a href="page.html?p=wiki/tools/frontend-design-plugin.md" class="featured-card fade-in">
         <p class="featured-topic">Tool</p>
         <h3 class="featured-title">Frontend Design Plugin</h3>
         <p class="featured-desc">455K installs. The official Anthropic plugin for distinctive, production-grade UI. All the value is in the prompt engineering of one markdown file.</p>
         <span class="featured-link">Read article &rarr;</span>
       </a>
-      <a href="wiki/figma/code-connect.md" class="featured-card fade-in">
+      <a href="page.html?p=wiki/figma/code-connect.md" class="featured-card fade-in">
         <p class="featured-topic">Figma</p>
         <h3 class="featured-title">Code Connect</h3>
         <p class="featured-desc">Maps Figma components to codebase components so the LLM uses your real design system instead of generating generic approximations.</p>
@@ -707,8 +707,8 @@ a { color: inherit; text-decoration: none; }
     <div class="footer-inner">
       <span>Claude Code for Design &middot; Springpod &middot; Internal KB</span>
       <ul class="footer-links">
-        <li><a href="wiki/index.md">Full Index</a></li>
-        <li><a href="wiki/overview.md">Overview</a></li>
+        <li><a href="page.html?p=wiki/index.md">Full Index</a></li>
+        <li><a href="page.html?p=wiki/overview.md">Overview</a></li>
         <li><a href="intro-to-claude-code-for-design.html">Intro Deck</a></li>
       </ul>
     </div>
@@ -723,49 +723,49 @@ const articles = [
     topic: "figma",
     tags: ["figma", "mcp", "integration"],
     summary: "16-tool MCP server \u2014 setup, remote vs desktop, tool inventory, 4 context channels",
-    href: "wiki/figma/figma-mcp-server.md"
+    href: "page.html?p=wiki/figma/figma-mcp-server.md"
   },
   {
     title: "Code Connect",
     topic: "figma",
     tags: ["figma", "code-connect", "design-system"],
     summary: "Maps Figma components to codebase components \u2014 eliminates guesswork for LLMs",
-    href: "wiki/figma/code-connect.md"
+    href: "page.html?p=wiki/figma/code-connect.md"
   },
   {
     title: "Code to Canvas",
     topic: "figma",
     tags: ["figma", "workflow", "bidirectional"],
     summary: "Bidirectional workflow \u2014 code to Figma frames to collaborative design to code",
-    href: "wiki/figma/code-to-canvas.md"
+    href: "page.html?p=wiki/figma/code-to-canvas.md"
   },
   {
     title: "Frontend Design Plugin",
     topic: "tools",
     tags: ["plugin", "skill", "design-quality"],
     summary: "Official Anthropic plugin (455K installs) \u2014 bold aesthetics, anti-AI-slop prompt engineering",
-    href: "wiki/tools/frontend-design-plugin.md"
+    href: "page.html?p=wiki/tools/frontend-design-plugin.md"
   },
   {
     title: "Distributional Convergence",
     topic: "tools",
     tags: ["concept", "design-quality", "llm-behavior"],
     summary: "Why LLMs produce generic designs and the prompting altitude fix",
-    href: "wiki/tools/distributional-convergence.md"
+    href: "page.html?p=wiki/tools/distributional-convergence.md"
   },
   {
     title: "Figma to Code Workflow",
     topic: "workflows",
     tags: ["workflow", "figma", "design-team"],
     summary: "Anthropic Design team's workflow \u2014 design discovery, autonomous loops, bidirectional",
-    href: "wiki/workflows/figma-to-code.md"
+    href: "page.html?p=wiki/workflows/figma-to-code.md"
   },
   {
     title: "Claude Code Best Practices",
     topic: "workflows",
     tags: ["workflow", "best-practices", "skills"],
     summary: "Official practices for design \u2014 skills, subagents, context management, verification",
-    href: "wiki/workflows/claude-code-best-practices.md"
+    href: "page.html?p=wiki/workflows/claude-code-best-practices.md"
   }
 ];
 
