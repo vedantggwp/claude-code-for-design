@@ -1,0 +1,74 @@
+name: Wiki Ingest
+
+on:
+  workflow_dispatch:
+    inputs:
+      url:
+        description: 'URL to ingest into the wiki'
+        required: true
+        type: string
+
+jobs:
+  ingest:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install Claude Code
+        run: npm install -g @anthropic-ai/claude-code
+
+      - name: Run wiki-ingest
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+        run: |
+          claude --print --dangerously-skip-permissions \
+            "You are operating in headless CI mode. Use the wiki-ingest skill to ingest this URL: ${{ inputs.url }}
+
+            IMPORTANT CI OVERRIDES:
+            - Skip step 3 (user confirmation) — auto-approve all takeaways
+            - Do NOT wait for user input at any point
+            - Proceed through all 11 steps autonomously
+            - Write all articles, update index, overview, log, and backlinks
+
+            After completing all wiki-ingest steps, do NOT commit — the CI pipeline handles that."
+
+      - name: Create branch and PR
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          if git diff --quiet && git diff --cached --quiet; then
+            echo "No changes detected. Exiting."
+            exit 0
+          fi
+
+          TIMESTAMP=$(date +%Y%m%d-%H%M%S)
+          BRANCH="ingest/${TIMESTAMP}"
+          git checkout -b "$BRANCH"
+
+          git config user.name "Wiki Ingest Bot"
+          git config user.email "wiki-ingest@springpod.com"
+
+          git add -A
+          git commit -m "wiki-ingest: ${{ inputs.url }}"
+
+          git push origin "$BRANCH"
+          gh pr create \
+            --title "Wiki ingest: $(echo '${{ inputs.url }}' | head -c 60)" \
+            --body "## Automated Wiki Ingest
+
+          **Source URL:** ${{ inputs.url }}
+
+          This PR was created automatically by the wiki-ingest pipeline.
+          Review the new/updated articles before merging.
+
+          ---
+          *Triggered via the wiki landing page submission form.*" \
+            --base main

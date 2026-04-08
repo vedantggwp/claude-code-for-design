@@ -452,31 +452,11 @@ a:hover { text-decoration: underline; }
   </ul>
 </footer>
 
+<script src="wiki-registry.js"></script>
 <script>
-// ── ARTICLE REGISTRY (for sidebar navigation) ──
-const registry = {
-  figma: [
-    { title: "Figma MCP Server", path: "wiki/figma/figma-mcp-server.md" },
-    { title: "Code Connect", path: "wiki/figma/code-connect.md" },
-    { title: "Code to Canvas", path: "wiki/figma/code-to-canvas.md" }
-  ],
-  tools: [
-    { title: "Frontend Design Plugin", path: "wiki/tools/frontend-design-plugin.md" },
-    { title: "Distributional Convergence", path: "wiki/tools/distributional-convergence.md" }
-  ],
-  workflows: [
-    { title: "Figma to Code", path: "wiki/workflows/figma-to-code.md" },
-    { title: "Best Practices", path: "wiki/workflows/claude-code-best-practices.md" }
-  ],
-  meta: [
-    { title: "Index", path: "wiki/index.md" },
-    { title: "Overview", path: "wiki/overview.md" }
-  ]
-};
-
 // ── GET PAGE PATH FROM URL ──
-const params = new URLSearchParams(window.location.search);
-const pagePath = params.get('p');
+var params = new URLSearchParams(window.location.search);
+var pagePath = params.get('p');
 
 if (!pagePath) {
   showError("No page specified", "Choose an article from the wiki.");
@@ -485,29 +465,50 @@ if (!pagePath) {
 }
 
 // ── BUILD SIDEBAR ──
-function buildSidebar(currentPath) {
-  const sidebar = document.getElementById('sidebar');
-  let html = '';
+function buildSidebar(currentPath, registryObj) {
+  var sidebar = document.getElementById('sidebar');
+  var html = '';
 
-  for (const [section, items] of Object.entries(registry)) {
-    const label = section.charAt(0).toUpperCase() + section.slice(1);
+  if (!registryObj) {
+    sidebar.innerHTML = '';
+    return;
+  }
+
+  var sections = Object.keys(registryObj);
+  for (var i = 0; i < sections.length; i++) {
+    var section = sections[i];
+    var items = registryObj[section];
+    var label = section.split('-').map(function(w) { return w.charAt(0).toUpperCase() + w.slice(1); }).join(' ');
     html += '<div class="sidebar-section">';
     html += '<p class="sidebar-label">' + label + '</p>';
     html += '<ul class="sidebar-list">';
-    for (const item of items) {
-      const active = item.path === currentPath ? ' active' : '';
-      html += '<li><a href="page.html?p=' + item.path + '" class="' + active + '">' + item.title + '</a></li>';
+    for (var j = 0; j < items.length; j++) {
+      var item = items[j];
+      var active = ('wiki/' + item.path) === currentPath ? ' active' : '';
+      html += '<li><a href="page.html?p=wiki/' + item.path + '" class="' + active + '">' + item.title + '</a></li>';
     }
     html += '</ul></div>';
   }
 
+  // Add meta section (always present)
+  html += '<div class="sidebar-section">';
+  html += '<p class="sidebar-label">Meta</p>';
+  html += '<ul class="sidebar-list">';
+  html += '<li><a href="page.html?p=wiki/index.md" class="' + (currentPath === 'wiki/index.md' ? ' active' : '') + '">Index</a></li>';
+  html += '<li><a href="page.html?p=wiki/overview.md" class="' + (currentPath === 'wiki/overview.md' ? ' active' : '') + '">Overview</a></li>';
+  html += '</ul></div>';
+
   sidebar.innerHTML = html;
 }
 
+// Load sidebar asynchronously (non-blocking)
+loadRegistry().then(function(articles) {
+  var grouped = groupByTopic(articles);
+  buildSidebar(pagePath || '', grouped);
+});
+
 // ── LOAD AND RENDER PAGE ──
 async function loadPage(path) {
-  buildSidebar(path);
-
   try {
     const resp = await fetch(path);
     if (!resp.ok) throw new Error('Not found');
@@ -614,7 +615,7 @@ function showError(title, message) {
       '<p>' + message + '</p>' +
       '<a href="index.html" class="btn-home">Back to Home</a>' +
     '</div>';
-  buildSidebar('');
+  buildSidebar('', null);
 }
 </script>
 </body>
