@@ -10,3 +10,4 @@ Thumbs.db
 
 # Node modules (if any tools installed locally)
 node_modules/
+.vercel

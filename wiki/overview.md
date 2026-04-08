@@ -42,6 +42,11 @@ LLMs trained on web data sample from the high-probability center — producing I
 - **Figma to Code Workflow** — [[workflows/figma-to-code]] — Anthropic Design team's reference workflow
 - **Claude Code Best Practices** — [[workflows/claude-code-best-practices]] — official practices for design context
 
+- **Community Design Skills** — [[design-systems/community-design-skills]] — 63+ skills across 8 plugins (MC Dean)
+- **Claude Code Ultimate Guide** — [[tools/claude-code-ultimate-guide]] — 3.1K-star community reference (Florian Bruniaux)
+- **Designer Onboarding** — [[workflows/designer-onboarding]] — zero to shipping, synthesized from 4 guides
+- **Figma Roundtrip Limitations** — [[figma/figma-roundtrip-limitations]] — honest assessment of bidirectional workflow friction
+
 ## Key People
 
 - **Prithvi Rajasekaran** — Anthropic Applied AI, frontend-design plugin author
@@ -51,3 +56,8 @@ LLMs trained on web data sample from the high-probability center — producing I
 - **Gui Seiz** — Figma Design Director of AI, code-to-canvas
 - **Boris Cherny** — Claude Code creator
 - **Dylan Field** — Figma CEO, integration announcements
+- **MC Dean** — 63 design skills across 8 plugins (Owl-Listener/designer-skills)
+- **Dhika Endi Astowo** — Design system designer workflow with CLAUDE.md
+- **Felix Lee** — Most prolific designer-focused Claude Code educator
+- **Jessica Hische** — Famous letterer, portfolio workshop signals creative professional adoption
+- **Florian Bruniaux** — Claude Code Ultimate Guide (3.1K stars)
