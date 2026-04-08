@@ -1,0 +1,1024 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Intro to Claude Code for Design</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=Poppins:wght@200;300;400;600;700&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+/* --- BRAND TOKENS --- */
+:root {
+  /* Colour */
+  --sp-navy:       #16254c;
+  --sp-teal:       #00a5ac;
+  --sp-blue:       #1549f4;
+  --sp-cream:      #fdf6ec;
+  --sp-page-bg:    #f7fafc;
+  --sp-white:      #ffffff;
+  --sp-gold:       #e5a630;
+
+  /* Semantic */
+  --sp-text:       #16254c;
+  --sp-text-muted: #5a6a7a;
+  --sp-red:        #dc3545;
+  --sp-amber:      #d4870f;
+  --sp-green:      #1a8754;
+
+  /* Typography */
+  --font-display:  'Poppins', sans-serif;
+  --font-mono:     'IBM Plex Mono', monospace;
+
+  /* Type scale -- minor third (1.2) with clamp, bumped ~15% for presentation viewing distance */
+  --text-xs:      clamp(0.75rem, 0.7rem + 0.25vw, 0.875rem);
+  --text-sm:      clamp(0.875rem, 0.8rem + 0.3vw, 1rem);
+  --text-base:    clamp(1rem, 0.9rem + 0.35vw, 1.15rem);
+  --text-lg:      clamp(1.15rem, 1.05rem + 0.45vw, 1.38rem);
+  --text-xl:      clamp(1.44rem, 1.25rem + 0.7vw, 1.66rem);
+  --text-2xl:     clamp(1.728rem, 1.4rem + 1.15vw, 2rem);
+  --text-3xl:     clamp(2rem, 1.6rem + 1.7vw, 2.75rem);
+  --text-display: clamp(2.875rem, 2.1rem + 3.4vw, 5.2rem);
+
+  /* Tracking */
+  --track-display:  -0.04em;
+  --track-heading:  -0.025em;
+  --track-body:     0.005em;
+  --track-label:    0.08em;
+  --track-overline: 0.15em;
+
+  /* Safe areas */
+  --safe-top:    clamp(48px, 10vh, 108px);
+  --safe-bottom: clamp(56px, 10vh, 108px);
+  --safe-left:   clamp(48px, 10vw, 192px);
+  --safe-right:  clamp(48px, 10vw, 192px);
+  --safe-max-w:  1100px;
+
+  /* Rhythm and cards */
+  --rhythm: 1.5rem;
+  --card-radius: 12px;
+  --card-shadow: 0 2px 12px rgba(22, 37, 76, 0.07);
+}
+
+/* --- BODY --- */
+body {
+  font-family: var(--font-display);
+  color: var(--sp-text);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  overflow: hidden;
+  height: 100vh;
+  background: var(--sp-navy);
+}
+
+/* --- DECK (horizontal scroll-snap) --- */
+.deck {
+  display: flex;
+  height: 100vh;
+  overflow-x: auto;
+  overflow-y: hidden;
+  scroll-snap-type: x mandatory;
+  scroll-behavior: smooth;
+  -webkit-overflow-scrolling: touch;
+}
+.deck::-webkit-scrollbar { display: none; }
+
+/* --- SLIDES --- */
+.slide {
+  flex: 0 0 100vw;
+  width: 100vw;
+  height: 100vh;
+  scroll-snap-align: start;
+  position: relative;
+  overflow: hidden;
+}
+.slide-navy  { background: var(--sp-navy); color: var(--sp-white); }
+.slide-cream { background: var(--sp-cream); color: var(--sp-text); }
+
+/* --- SLIDE INNER (safe area) --- */
+.slide-inner {
+  width: calc(100% - var(--safe-left) - var(--safe-right));
+  max-width: var(--safe-max-w);
+  height: calc(100% - var(--safe-top) - var(--safe-bottom));
+  margin: var(--safe-top) auto var(--safe-bottom);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  overflow: hidden;
+}
+.slide-inner.scrollable {
+  overflow-y: auto;
+  justify-content: flex-start;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+}
+.slide-inner.scrollable::-webkit-scrollbar { display: none; }
+
+/* --- FIXED UI --- */
+.progress-bar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 3px;
+  background: var(--sp-gold);
+  z-index: 1000;
+  transition: width 0.25s ease-out;
+}
+.slide-counter {
+  position: fixed;
+  bottom: 24px;
+  left: 32px;
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  letter-spacing: var(--track-label);
+  color: rgba(22, 37, 76, 0.3);
+  transition: color 0.4s;
+  z-index: 100;
+}
+.slide-counter.on-dark { color: rgba(255,255,255,0.25); }
+.nav-hint {
+  position: fixed;
+  bottom: 24px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  color: rgba(255,255,255,0.25);
+  transition: opacity 0.5s, color 0.4s;
+  z-index: 100;
+}
+.nav-hint.on-light { color: rgba(22, 37, 76, 0.25); }
+.nav-hint.hidden { opacity: 0; pointer-events: none; }
+.nav-hint kbd {
+  display: inline-block;
+  padding: 2px 8px;
+  border: 1px solid currentColor;
+  border-radius: 4px;
+  font-size: inherit;
+  margin: 0 2px;
+}
+.brand-mark {
+  position: fixed;
+  bottom: 24px;
+  right: 32px;
+  font-family: var(--font-display);
+  font-size: var(--text-sm);
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  color: rgba(255,255,255,0.3);
+  transition: color 0.4s;
+  z-index: 100;
+}
+.brand-mark.on-light { color: rgba(22, 37, 76, 0.2); }
+
+/* --- OVERLINE --- */
+.overline {
+  font-size: var(--text-xs);
+  font-weight: 600;
+  letter-spacing: var(--track-overline);
+  text-transform: uppercase;
+  font-feature-settings: 'case' 1;
+  margin-bottom: calc(var(--rhythm) * 1.5);
+}
+.overline-gold  { color: var(--sp-gold); }
+.overline-muted { color: var(--sp-text-muted); }
+
+/* --- DISPLAY HEADING --- */
+.display {
+  font-size: var(--text-display);
+  font-weight: 200;
+  line-height: 1.05;
+  letter-spacing: var(--track-display);
+  text-wrap: balance;
+  margin-bottom: calc(var(--rhythm) * 0.75);
+}
+.display strong { font-weight: 300; color: var(--sp-gold); }
+
+/* --- SECTION HEADING --- */
+.heading {
+  font-size: var(--text-3xl);
+  font-weight: 700;
+  line-height: 1.15;
+  letter-spacing: var(--track-heading);
+  text-wrap: balance;
+  margin-bottom: calc(var(--rhythm) * 1.5);
+}
+.heading .count {
+  font-weight: 300;
+  font-size: var(--text-lg);
+  margin-left: 8px;
+  opacity: 0.45;
+}
+
+/* --- SUBTITLE --- */
+.subtitle {
+  font-size: var(--text-base);
+  font-weight: 300;
+  line-height: 1.55;
+  letter-spacing: var(--track-body);
+  max-width: 65ch;
+}
+.subtitle-dim { opacity: 0.5; }
+
+/* --- CALLOUT --- */
+.callout {
+  border-left: 3px solid var(--sp-gold);
+  padding: 20px 24px;
+  border-radius: 0 10px 10px 0;
+  font-size: var(--text-base);
+  font-weight: 300;
+  line-height: 1.7;
+  letter-spacing: var(--track-body);
+  max-width: 65ch;
+  margin-top: calc(var(--rhythm) * 2);
+}
+.callout-navy  { background: rgba(255,255,255,0.05); color: rgba(255,255,255,0.85); }
+.callout-cream { background: var(--sp-white); color: var(--sp-text); box-shadow: var(--card-shadow); }
+
+/* --- STAT ROW --- */
+.stat-row {
+  display: flex;
+  gap: 48px;
+  margin-top: calc(var(--rhythm) * 2.5);
+}
+.stat-num {
+  font-family: var(--font-mono);
+  font-size: clamp(2.3rem, 1.7rem + 2.3vw, 4rem);
+  font-weight: 600;
+  line-height: 1;
+  color: var(--sp-gold);
+  font-variant-numeric: tabular-nums lining-nums;
+}
+.stat-label {
+  font-size: var(--text-xs);
+  letter-spacing: var(--track-label);
+  text-transform: uppercase;
+  font-feature-settings: 'case' 1;
+  margin-top: 8px;
+  opacity: 0.35;
+}
+
+/* --- CARD GRID --- */
+.card-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+}
+.card {
+  background: var(--sp-white);
+  border-radius: var(--card-radius);
+  padding: 18px 22px;
+  box-shadow: var(--card-shadow);
+  transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1),
+              box-shadow 0.25s ease;
+  cursor: default;
+}
+.card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 24px rgba(22, 37, 76, 0.1);
+}
+.card-num {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  background: var(--sp-gold);
+  color: var(--sp-white);
+  border-radius: 50%;
+  font-size: var(--text-xs);
+  font-weight: 700;
+  margin-bottom: 8px;
+}
+.card h3 {
+  font-size: var(--text-sm);
+  font-weight: 600;
+  line-height: 1.35;
+  letter-spacing: var(--track-body);
+  margin-bottom: 4px;
+}
+.card p {
+  font-size: var(--text-xs);
+  color: var(--sp-text-muted);
+  line-height: 1.5;
+  letter-spacing: var(--track-body);
+}
+
+/* --- BLOCKER CARDS (navy bg) --- */
+.blocker-card {
+  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(255,255,255,0.07);
+  border-radius: var(--card-radius);
+  padding: 28px 32px;
+  margin-bottom: 16px;
+  display: flex;
+  gap: 20px;
+  align-items: flex-start;
+  transition: background 0.3s;
+}
+.blocker-card:hover { background: rgba(255,255,255,0.08); }
+.blocker-num {
+  flex-shrink: 0;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: var(--text-xs);
+  font-weight: 700;
+  color: var(--sp-white);
+  background: var(--sp-red);
+  margin-top: 2px;
+}
+.blocker-h3 {
+  font-size: var(--text-lg);
+  font-weight: 600;
+  margin-bottom: 8px;
+  line-height: 1.3;
+  letter-spacing: var(--track-heading);
+}
+.blocker-p {
+  font-size: var(--text-sm);
+  line-height: 1.6;
+  letter-spacing: var(--track-body);
+  opacity: 0.55;
+}
+
+/* --- ISSUE CARDS --- */
+.issue {
+  background: var(--sp-white);
+  border-radius: var(--card-radius);
+  padding: 14px 20px;
+  box-shadow: var(--card-shadow);
+  margin-bottom: 6px;
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+  cursor: pointer;
+  transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  user-select: none;
+}
+.issue.collapsible:hover { transform: translateX(3px); }
+.issue.collapsible .issue-body p {
+  max-height: 0;
+  overflow: hidden;
+  margin-top: 0;
+  transition: max-height 0.4s cubic-bezier(0.16, 1, 0.3, 1),
+              margin-top 0.4s;
+}
+.issue.collapsible.open .issue-body p { max-height: 200px; margin-top: 5px; }
+.issue .chevron {
+  margin-left: auto;
+  flex-shrink: 0;
+  align-self: center;
+  font-size: 10px;
+  color: #ccc;
+  transition: transform 0.3s;
+  display: none;
+}
+.issue.collapsible .chevron { display: block; }
+.issue.collapsible.open .chevron { transform: rotate(90deg); }
+.issue.dimmed { opacity: 0.5; cursor: default; }
+.issue.dimmed:hover { transform: none; }
+
+/* Issue body */
+.issue-body h3 {
+  font-size: var(--text-sm);
+  font-weight: 600;
+  line-height: 1.35;
+  letter-spacing: var(--track-body);
+}
+.issue-body p {
+  font-size: var(--text-xs);
+  color: var(--sp-text-muted);
+  line-height: 1.5;
+  margin-top: 4px;
+}
+
+/* Issue dots */
+.issue-dot {
+  flex-shrink: 0;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 9px;
+  font-weight: 700;
+  color: var(--sp-white);
+  margin-top: 1px;
+}
+.dot-amber { background: var(--sp-amber); }
+.dot-muted { background: #b8a88a; }
+.dot-navy  { background: var(--sp-navy); opacity: 0.35; }
+.dot-gold  { background: var(--sp-gold); }
+
+/* --- BADGES & PILLS --- */
+.badge {
+  display: inline-block;
+  padding: 3px 12px;
+  border-radius: 20px;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  font-feature-settings: 'case' 1;
+}
+.badge-amber { background: var(--sp-amber); color: var(--sp-white); }
+.badge-muted { background: #e8e0d4; color: var(--sp-text); }
+.badge-navy  { background: var(--sp-navy); color: var(--sp-white); opacity: 0.45; }
+.badge-gold  { background: var(--sp-gold); color: var(--sp-white); }
+
+.pill {
+  display: inline-block;
+  width: fit-content;
+  padding: 3px 12px;
+  border-radius: 20px;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  font-feature-settings: 'case' 1;
+  margin-bottom: calc(var(--rhythm) * 1.2);
+}
+.pill-red { background: var(--sp-red); color: var(--sp-white); }
+
+/* --- ISSUE GROUP --- */
+.issue-group { margin-bottom: 28px; }
+.issue-group-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+.group-label {
+  font-size: var(--text-xs);
+  font-weight: 600;
+  letter-spacing: var(--track-body);
+}
+
+/* --- TWO-COLUMN GRID --- */
+.two-col {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0 20px;
+  align-items: start;
+}
+.two-col .issue-group { break-inside: avoid; }
+
+/* --- CLOSING GRID --- */
+.closing-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 48px;
+  align-items: start;
+}
+
+/* --- CLOSING LIST --- */
+.closing-list { list-style: none; padding: 0; }
+.closing-list li {
+  font-size: var(--text-sm);
+  line-height: 1.55;
+  letter-spacing: var(--track-body);
+  padding: 7px 0 7px 18px;
+  position: relative;
+  opacity: 0.5;
+}
+.closing-list li::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 14px;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: currentColor;
+  opacity: 0.3;
+}
+
+/* --- SIGN-OFF --- */
+.sign-off {
+  font-size: var(--text-xl);
+  font-weight: 300;
+  line-height: 1.5;
+  letter-spacing: var(--track-heading);
+  opacity: 0.65;
+  margin-top: calc(var(--rhythm) * 1.5);
+}
+.sign-off strong { color: var(--sp-gold); font-weight: 400; }
+
+/* --- ANIMATIONS --- */
+.reveal {
+  opacity: 0;
+  transform: translateY(24px);
+  transition: opacity 0.65s cubic-bezier(0.16, 1, 0.3, 1),
+              transform 0.65s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.reveal.visible { opacity: 1; transform: translateY(0); }
+
+.reveal-scale {
+  opacity: 0;
+  transform: scale(0.94);
+  transition: opacity 0.55s cubic-bezier(0.16, 1, 0.3, 1),
+              transform 0.55s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.reveal-scale.visible { opacity: 1; transform: scale(1); }
+
+/* Stagger delays */
+.r1 { transition-delay: 0.08s; }
+.r2 { transition-delay: 0.16s; }
+.r3 { transition-delay: 0.24s; }
+.r4 { transition-delay: 0.32s; }
+.r5 { transition-delay: 0.40s; }
+.r6 { transition-delay: 0.48s; }
+.r7 { transition-delay: 0.56s; }
+
+/* --- REDUCED MOTION --- */
+@media (prefers-reduced-motion: reduce) {
+  .reveal, .reveal-scale { transition-duration: 0s; }
+  .deck { scroll-behavior: auto; }
+  .issue-body p { transition-duration: 0s; }
+}
+
+/* --- DESKTOP LOCKDOWN (>=769px) --- */
+@media (min-width: 769px) {
+  body { overflow: hidden; height: 100vh; }
+  .deck {
+    display: flex;
+    flex-direction: row;
+    height: 100vh;
+    overflow-x: auto;
+    overflow-y: hidden;
+    scroll-snap-type: x mandatory;
+  }
+  .slide {
+    flex: 0 0 100vw;
+    width: 100vw;
+    height: 100vh;
+    min-height: unset;
+    overflow: hidden;
+    scroll-snap-align: start;
+  }
+  .slide-inner {
+    width: calc(100% - var(--safe-left) - var(--safe-right));
+    max-width: var(--safe-max-w);
+    height: calc(100% - var(--safe-top) - var(--safe-bottom));
+    min-height: unset;
+    margin: var(--safe-top) auto var(--safe-bottom);
+    overflow: hidden;
+  }
+  .slide-inner.scrollable { overflow-y: auto; }
+}
+
+/* --- MOBILE (<=768px) --- */
+@media (max-width: 768px) {
+  :root {
+    --safe-top: 24px;
+    --safe-bottom: 40px;
+    --safe-left: 20px;
+    --safe-right: 20px;
+  }
+  body { overflow: hidden; height: 100vh; }
+  .deck {
+    flex-direction: column;
+    overflow-x: hidden;
+    overflow-y: auto;
+    scroll-snap-type: y mandatory;
+    height: 100vh;
+  }
+  .slide {
+    flex: none;
+    width: 100vw;
+    height: auto;
+    min-height: 100vh;
+    min-height: 100dvh;
+    overflow: visible;
+    scroll-snap-align: start;
+  }
+  .slide-inner {
+    height: auto;
+    min-height: calc(100dvh - var(--safe-top) - var(--safe-bottom));
+    overflow: visible;
+  }
+
+  /* Typography scale-down */
+  .display { font-size: clamp(1.8rem, 1.4rem + 2vw, 2.5rem); }
+  .heading { font-size: var(--text-2xl); }
+  .callout { font-size: var(--text-sm); padding: 16px 18px; }
+  .blocker-h3 { font-size: var(--text-base); }
+  .blocker-p { font-size: var(--text-xs); }
+  .blocker-card { padding: 18px 20px; gap: 14px; }
+  .blocker-num { width: 26px; height: 26px; }
+
+  /* Grid collapse */
+  .card-grid { grid-template-columns: 1fr; gap: 10px; }
+  .two-col { grid-template-columns: 1fr; gap: 0; }
+  .closing-grid { grid-template-columns: 1fr; gap: 24px; }
+
+  /* Stats */
+  .stat-row { gap: 24px; flex-wrap: wrap; }
+  .stat-num { font-size: clamp(1.5rem, 1.2rem + 1.5vw, 2rem); }
+
+  /* Cards */
+  .card { padding: 14px 18px; }
+  .issue { padding: 12px 16px; }
+
+  /* Sign-off */
+  .sign-off { font-size: var(--text-base); }
+
+  /* Hide fixed UI */
+  .brand-mark, .slide-counter { display: none; }
+  .nav-hint { font-size: 9px; bottom: 12px; }
+}
+
+/* --- PRINT --- */
+@page { margin: 0; size: landscape; }
+@media print {
+  body { overflow: visible; height: auto; background: white; margin: 0; }
+  .deck { display: block; height: auto; overflow: visible; }
+  .slide {
+    flex: none;
+    width: 100%;
+    height: auto;
+    min-height: 100vh;
+    page-break-after: always;
+    break-after: page;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .slide:last-child { page-break-after: avoid; }
+  .slide-inner {
+    position: static;
+    width: 80%;
+    height: auto;
+    max-width: var(--safe-max-w);
+    margin: 0 auto;
+    padding: 48px 0;
+  }
+  .reveal, .reveal-scale {
+    opacity: 1 !important;
+    transform: none !important;
+    transition: none !important;
+  }
+  .issue.collapsible .issue-body p {
+    max-height: none !important;
+    overflow: visible;
+    margin-top: 5px;
+  }
+  .issue .chevron { display: none; }
+  .progress-bar, .slide-counter, .nav-hint, .brand-mark { display: none !important; }
+  .slide-navy, .slide-cream {
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+}
+</style>
+</head>
+<body>
+  <!-- Fixed UI (outside deck) -->
+  <div class="progress-bar" id="progressBar"></div>
+  <div class="slide-counter" id="slideCounter">01 / 09</div>
+  <div class="nav-hint" id="navHint"><kbd>&larr;</kbd> <kbd>&rarr;</kbd> or scroll</div>
+  <div class="brand-mark" id="brandMark">Springpod</div>
+
+  <!-- Deck container -->
+  <div class="deck" id="deck">
+
+    <!-- SLIDE 1: Hero (Navy) -->
+    <section class="slide slide-navy" id="s1">
+      <div class="slide-inner">
+        <div class="overline overline-gold reveal">Introduction</div>
+        <h1 class="display reveal r1">Claude Code<br>for <strong>Design</strong></h1>
+        <p class="subtitle subtitle-dim reveal r2">How designers are shipping production code without writing a single line&mdash;and why it changes everything about the design&ndash;dev handoff.</p>
+        <div class="stat-row reveal r3">
+          <div>
+            <div class="stat-num" data-target="277">0</div>
+            <div class="stat-label">K Plugin Installs</div>
+          </div>
+          <div>
+            <div class="stat-num" data-target="3">0</div>
+            <div class="stat-label">&times; Faster Execution</div>
+          </div>
+          <div>
+            <div class="stat-num" data-target="65">0</div>
+            <div class="stat-label">Curated Resources</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SLIDE 2: What is Claude Code? (Cream) -->
+    <section class="slide slide-cream" id="s2">
+      <div class="slide-inner">
+        <div class="overline overline-muted reveal">The Basics</div>
+        <h2 class="heading reveal r1">What is Claude Code?</h2>
+        <div class="card-grid">
+          <div class="card reveal-scale r1">
+            <div class="card-num">1</div>
+            <h3>Terminal-native AI</h3>
+            <p>An agentic coding assistant that lives in your terminal, IDE, or browser. It reads, writes, and runs code autonomously.</p>
+          </div>
+          <div class="card reveal-scale r2">
+            <div class="card-num">2</div>
+            <h3>Natural language interface</h3>
+            <p>Describe what you want in plain English. Claude figures out the files, frameworks, and build steps.</p>
+          </div>
+          <div class="card reveal-scale r3">
+            <div class="card-num">3</div>
+            <h3>Figma MCP integration</h3>
+            <p>Reads your Figma files directly via the Model Context Protocol. Your design system becomes the source of truth.</p>
+          </div>
+          <div class="card reveal-scale r4">
+            <div class="card-num">4</div>
+            <h3>Bidirectional workflow</h3>
+            <p>Code &rarr; Figma and Figma &rarr; Code. Build in one, push to the other. True roundtrip design.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SLIDE 3: The Problem (Navy) -->
+    <section class="slide slide-navy" id="s3">
+      <div class="slide-inner">
+        <div class="overline overline-gold reveal">The Problem</div>
+        <h1 class="display reveal r1">&ldquo;AI Slop&rdquo;<br>is <strong>not inevitable</strong></h1>
+        <p class="subtitle subtitle-dim reveal r2">Generic AI output happens when tools lack design context. Claude Code solves this with skills&mdash;structured instructions that teach the AI your design system, typography rules, colour palettes, and animation principles.</p>
+        <div class="callout callout-navy reveal r3">
+          The frontend-design skill alone has 277,000+ installs. It replaces generic output with distinctive typography, bold colour, and purposeful motion&mdash;because the AI finally knows <em>how</em> you design.
+        </div>
+      </div>
+    </section>
+
+    <!-- SLIDE 4: How Designers Use It (Cream) -->
+    <section class="slide slide-cream" id="s4">
+      <div class="slide-inner">
+        <div class="overline overline-muted reveal">Workflows</div>
+        <h2 class="heading reveal r1">How designers are using it</h2>
+        <div class="card-grid">
+          <div class="card reveal-scale r1">
+            <div class="card-num">1</div>
+            <h3>Figma &rarr; production code</h3>
+            <p>Pull design context via MCP, generate pixel-perfect React/HTML/Tailwind. Skip the handoff doc entirely.</p>
+          </div>
+          <div class="card reveal-scale r2">
+            <div class="card-num">2</div>
+            <h3>Code &rarr; editable Figma</h3>
+            <p>Push a running UI back into Figma as native, editable layers. Designers iterate on what&rsquo;s already built.</p>
+          </div>
+          <div class="card reveal-scale r3">
+            <div class="card-num">3</div>
+            <h3>Rapid prototyping</h3>
+            <p>Describe an interaction, get a working prototype in minutes. Test with real users, not static mockups.</p>
+          </div>
+          <div class="card reveal-scale r4">
+            <div class="card-num">4</div>
+            <h3>Design system enforcement</h3>
+            <p>Claude reads your tokens, components, and spacing rules. Every output is on-brand by default.</p>
+          </div>
+          <div class="card reveal-scale r5">
+            <div class="card-num">5</div>
+            <h3>Portfolio &amp; personal sites</h3>
+            <p>Designers like Jessica Hische and Oliur are building their own sites with zero prior coding experience.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SLIDE 5: The Figma Connection (Navy) -->
+    <section class="slide slide-navy" id="s5">
+      <div class="slide-inner">
+        <div class="overline overline-gold reveal">The Bridge</div>
+        <h1 class="display reveal r1">Figma <strong>&harr;</strong> Claude Code</h1>
+        <p class="subtitle subtitle-dim reveal r2">The Figma MCP server is the killer integration. It gives Claude Code full context of your design system&mdash;components, variables, spacing, typography&mdash;so generated code matches your frames, not generic defaults.</p>
+        <div class="callout callout-navy reveal r3">
+          &ldquo;I now spend equal time in Claude Code and Figma, and I hand engineers draft PRs instead of only mocks.&rdquo;<br>
+          <span style="font-size: var(--text-xs); opacity: 0.5; margin-top: 8px; display: inline-block;">&mdash; Meaghan Choi, Design Lead, Claude Code at Anthropic</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- SLIDE 6: The Learning Path (Cream) -->
+    <section class="slide slide-cream" id="s6">
+      <div class="slide-inner scrollable">
+        <div class="overline overline-muted reveal">Your Journey</div>
+        <h2 class="heading reveal r1">From scared to powered</h2>
+        <div class="issue-group">
+          <div class="issue collapsible reveal r1" onclick="this.classList.toggle('open')">
+            <div class="issue-dot dot-gold">1</div>
+            <div class="issue-body">
+              <h3>Week 1: Foundations</h3>
+              <p>Install Claude Code. Read the official docs. Watch Oliur&rsquo;s beginner guide. Build a simple page with just words.</p>
+            </div>
+            <span class="chevron">&#9654;</span>
+          </div>
+          <div class="issue collapsible reveal r2" onclick="this.classList.toggle('open')">
+            <div class="issue-dot dot-gold">2</div>
+            <div class="issue-body">
+              <h3>Week 2: Figma MCP setup</h3>
+              <p>Connect Figma via MCP. Pull a real design into code. See your tokens and components come alive automatically.</p>
+            </div>
+            <span class="chevron">&#9654;</span>
+          </div>
+          <div class="issue collapsible reveal r3" onclick="this.classList.toggle('open')">
+            <div class="issue-dot dot-gold">3</div>
+            <div class="issue-body">
+              <h3>Week 3: Skills &amp; plugins</h3>
+              <p>Install the frontend-design skill. Try Impeccable. Customise your CLAUDE.md to enforce your brand&rsquo;s design language.</p>
+            </div>
+            <span class="chevron">&#9654;</span>
+          </div>
+          <div class="issue collapsible reveal r4" onclick="this.classList.toggle('open')">
+            <div class="issue-dot dot-gold">4</div>
+            <div class="issue-body">
+              <h3>Week 4: Ship something real</h3>
+              <p>Build your portfolio site. Push code to Figma for team review. Hand a draft PR to engineering. You&rsquo;re a Claude Code-powered designer.</p>
+            </div>
+            <span class="chevron">&#9654;</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SLIDE 7: Key People (Navy) -->
+    <section class="slide slide-navy" id="s7">
+      <div class="slide-inner scrollable">
+        <div class="overline overline-gold reveal">Who to Follow</div>
+        <h2 class="heading reveal r1" style="color: var(--sp-white);">The people building this space</h2>
+        <div class="blocker-card reveal r2">
+          <div class="blocker-num" style="background: var(--sp-gold);">F</div>
+          <div>
+            <h3 class="blocker-h3">Felix Lee <span style="font-weight: 300; font-size: var(--text-sm); opacity: 0.5;">@felixleezd</span></h3>
+            <p class="blocker-p">Most prolific designer-focused Claude Code educator. Teaches the full Figma &harr; Claude Code roundtrip.</p>
+          </div>
+        </div>
+        <div class="blocker-card reveal r3">
+          <div class="blocker-num" style="background: var(--sp-teal);">N</div>
+          <div>
+            <h3 class="blocker-h3">Nick Babich <span style="font-weight: 300; font-size: var(--text-sm); opacity: 0.5;">@101babich</span></h3>
+            <p class="blocker-p">UX Planet author. Curates design skills, documents design system workflows with Claude Code.</p>
+          </div>
+        </div>
+        <div class="blocker-card reveal r4">
+          <div class="blocker-num" style="background: var(--sp-blue);">M</div>
+          <div>
+            <h3 class="blocker-h3">Michal Malewicz <span style="font-weight: 300; font-size: var(--text-sm); opacity: 0.5;">@michalmalewicz</span></h3>
+            <p class="blocker-p">Established designer sharing real workflows: Paper &rarr; Pixelmator Pro &rarr; Claude Code for mobile.</p>
+          </div>
+        </div>
+        <div class="blocker-card reveal r5">
+          <div class="blocker-num" style="background: var(--sp-gold);">C</div>
+          <div>
+            <h3 class="blocker-h3">Cat Wu <span style="font-weight: 300; font-size: var(--text-sm); opacity: 0.5;">@_catwu &middot; Anthropic</span></h3>
+            <p class="blocker-p">Created the official frontend-design skill plugin. The person who taught Claude how to make things beautiful.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SLIDE 8: Getting Started (Cream) -->
+    <section class="slide slide-cream" id="s8">
+      <div class="slide-inner">
+        <div class="overline overline-muted reveal">Action Plan</div>
+        <h2 class="heading reveal r1">Five things to do today</h2>
+        <div class="card-grid">
+          <div class="card reveal-scale r1">
+            <div class="card-num">1</div>
+            <h3>Install Claude Code</h3>
+            <p>Open your terminal and run the installer. Takes 2 minutes. Works on Mac, Windows, and Linux.</p>
+          </div>
+          <div class="card reveal-scale r2">
+            <div class="card-num">2</div>
+            <h3>Install the frontend-design skill</h3>
+            <p>One command. Instantly improves every UI Claude generates&mdash;typography, colour, spacing, motion.</p>
+          </div>
+          <div class="card reveal-scale r3">
+            <div class="card-num">3</div>
+            <h3>Connect Figma MCP</h3>
+            <p>Follow Figma&rsquo;s official guide. Give Claude read access to your design system file. Context is everything.</p>
+          </div>
+          <div class="card reveal-scale r4">
+            <div class="card-num">4</div>
+            <h3>Build one page</h3>
+            <p>Start with your portfolio, a landing page, or a component. Just describe it and watch.</p>
+          </div>
+          <div class="card reveal-scale r5">
+            <div class="card-num">5</div>
+            <h3>Push code &rarr; Figma</h3>
+            <p>Use Code to Canvas to push your build back into Figma. Show your team the roundtrip.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SLIDE 9: Closing (Navy) -->
+    <section class="slide slide-navy" id="s9">
+      <div class="slide-inner">
+        <div class="closing-grid">
+          <div>
+            <div class="overline overline-gold reveal">Resources</div>
+            <h2 class="heading reveal r1" style="color: var(--sp-white);">Where to go deeper</h2>
+            <ul class="closing-list reveal r2">
+              <li>anthropic.com/claude-code &mdash; Official product page</li>
+              <li>figma.com/blog/introducing-claude-code-to-figma &mdash; The integration</li>
+              <li>claude.com/plugins/frontend-design &mdash; The design plugin</li>
+              <li>Our wiki: 65 curated resources from beginner to advanced</li>
+              <li>Follow @felixleezd, @101babich, @michalmalewicz on X</li>
+            </ul>
+          </div>
+          <div>
+            <div class="callout callout-navy reveal r3" style="margin-top: 0;">
+              <div style="font-size: var(--text-sm); font-weight: 600; color: var(--sp-gold); margin-bottom: 10px; letter-spacing: var(--track-body);">
+                The gap worth filling
+              </div>
+              Almost no content covers designers contributing to existing codebases. Everything assumes greenfield. That&rsquo;s the next frontier.
+            </div>
+            <div class="sign-off reveal r4">
+              The handoff is dead.<br>
+              <strong>Long live the designer who ships.</strong>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </div>
+
+  <script>
+const deck = document.getElementById('deck');
+const slides = document.querySelectorAll('.slide');
+const total = slides.length;
+const progressBar = document.getElementById('progressBar');
+const counter = document.getElementById('slideCounter');
+const navHint = document.getElementById('navHint');
+const brandMark = document.getElementById('brandMark');
+
+// --- Reveal observer ---
+const revealObserver = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) entry.target.classList.add('visible');
+  });
+}, { threshold: 0.12, root: deck });
+
+document.querySelectorAll('.reveal, .reveal-scale').forEach(el => revealObserver.observe(el));
+
+// --- Counter animation observer ---
+const counterObserver = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (!entry.isIntersecting) return;
+    const el = entry.target;
+    const target = parseInt(el.dataset.target);
+    let current = 0;
+    const step = Math.max(1, Math.ceil(target / 25));
+    const interval = setInterval(() => {
+      current += step;
+      if (current >= target) { current = target; clearInterval(interval); }
+      el.textContent = current;
+    }, 45);
+    counterObserver.unobserve(el);
+  });
+}, { threshold: 0.5, root: deck });
+
+document.querySelectorAll('.stat-num[data-target]').forEach(el => counterObserver.observe(el));
+
+// --- Scroll handler (progress, counter, dark/light) ---
+deck.addEventListener('scroll', () => {
+  const maxScroll = deck.scrollWidth - deck.clientWidth;
+  const pct = maxScroll > 0 ? (deck.scrollLeft / maxScroll) * 100 : 0;
+  progressBar.style.width = pct + '%';
+
+  const idx = Math.round(deck.scrollLeft / deck.clientWidth);
+  const num = String(idx + 1).padStart(2, '0');
+  counter.textContent = num + ' / ' + String(total).padStart(2, '0');
+
+  const current = slides[idx];
+  const isDark = current && current.classList.contains('slide-navy');
+  counter.classList.toggle('on-dark', isDark);
+  navHint.classList.toggle('on-light', !isDark);
+  brandMark.classList.toggle('on-light', !isDark);
+
+  if (deck.scrollLeft > 50) navHint.classList.add('hidden');
+});
+
+// --- Keyboard navigation ---
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'ArrowRight' || e.key === 'ArrowDown' || e.key === ' ') {
+    e.preventDefault();
+    const idx = Math.round(deck.scrollLeft / deck.clientWidth);
+    const next = Math.min(idx + 1, total - 1);
+    slides[next].scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'start' });
+  }
+  if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') {
+    e.preventDefault();
+    const idx = Math.round(deck.scrollLeft / deck.clientWidth);
+    const prev = Math.max(idx - 1, 0);
+    slides[prev].scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'start' });
+  }
+});
+  </script>
+</body>
+</html>
