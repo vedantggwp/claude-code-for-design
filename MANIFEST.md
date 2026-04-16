@@ -26,9 +26,30 @@
 - `intro-to-claude-code-for-design.html` — 9-slide Springpod-branded intro deck for designers
 - `.claude/launch.json` — Dev server config for local preview
 
+## Wiki Articles (11 pages)
+- `wiki/figma/figma-mcp-server.md` — 16-tool MCP server reference
+- `wiki/figma/code-connect.md` — Component-to-code mapping system
+- `wiki/figma/code-to-canvas.md` — Bidirectional code↔Figma workflow
+- `wiki/figma/figma-roundtrip-limitations.md` — Honest assessment of roundtrip friction
+- `wiki/tools/frontend-design-plugin.md` — Official Anthropic plugin (455K installs)
+- `wiki/tools/distributional-convergence.md` — Why LLMs make generic designs
+- `wiki/tools/claude-code-ultimate-guide.md` — Community mega-guide (3.1K stars)
+- `wiki/workflows/figma-to-code.md` — Anthropic Design team's reference workflow
+- `wiki/workflows/claude-code-best-practices.md` — Official practices for design context
+- `wiki/workflows/designer-onboarding.md` — Zero to shipping guide for designers
+- `wiki/design-systems/community-design-skills.md` — 63+ skills ecosystem
+
+## Raw Sources (19 files)
+- `raw/figma/` — 8 files (MCP docs, setup guide, tools reference, community tutorials)
+- `raw/tools/` — 5 files (best practices, Anthropic teams, frontend-design, ultimate guide)
+- `raw/workflows/` — 4 files (designer guides from Builder.io, Felix Lee, Oliur, Hische)
+- `raw/design-systems/` — 2 files (63 design skills, design system designer workflow)
+
 ## Recent Changes
 - 2026-04-08: Self-updating wiki — dynamic registry from wiki/index.md, ingest API + GitHub Actions, submission modal
 - 2026-04-08: Created `page.html` — markdown renderer with Springpod chrome, sidebar, cross-ref resolution
+- 2026-04-08: Ingested batch 2 — designer guides, Figma deep-dives, community skills, ultimate guide
+- 2026-04-08: Ingested batch 1 — official Anthropic + Figma sources (8 raw, 7 wiki articles)
 - 2026-04-08: Created `index.html` — landing page with hero, problem section, 7-topic grid, featured articles, live search
 - 2026-04-08: Created `intro-to-claude-code-for-design.html` — 9-slide intro deck using springpod-presentation skill
 - 2026-04-08: Created `first-list.md` — 65 URLs across 9 tiers for wiki ingest (P0/P1/P2 prioritized)
