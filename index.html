@@ -549,6 +549,127 @@ a { color: inherit; text-decoration: none; }
 .search-results::-webkit-scrollbar { width: 6px; }
 .search-results::-webkit-scrollbar-track { background: transparent; }
 .search-results::-webkit-scrollbar-thumb { background: var(--sp-border); border-radius: 3px; }
+
+/* ── INGEST MODAL ── */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+  background: rgba(22,37,76,0.55);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: 1.5rem;
+}
+
+.modal-overlay.active { display: flex; }
+
+.modal {
+  background: var(--sp-white);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-lg);
+  width: 100%;
+  max-width: 480px;
+  padding: 2.5rem;
+  position: relative;
+}
+
+.modal-close {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--sp-text-muted);
+  font-size: 1.4rem;
+  line-height: 1;
+  transition: color var(--transition);
+}
+
+.modal-close:hover { color: var(--sp-text); }
+
+.modal-label {
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  font-weight: 500;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--sp-teal);
+  margin-bottom: 0.5rem;
+}
+
+.modal h2 {
+  font-size: var(--text-xl);
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  margin-bottom: 0.5rem;
+}
+
+.modal p.desc {
+  font-size: var(--text-sm);
+  color: var(--sp-text-muted);
+  font-weight: 300;
+  line-height: 1.55;
+  margin-bottom: 1.75rem;
+}
+
+.modal-field { margin-bottom: 1rem; }
+
+.modal-field label {
+  display: block;
+  font-size: var(--text-xs);
+  font-weight: 500;
+  margin-bottom: 0.4rem;
+  color: var(--sp-text);
+}
+
+.modal-input {
+  width: 100%;
+  padding: 11px 14px;
+  font-family: var(--font-display);
+  font-size: var(--text-sm);
+  border: 1.5px solid var(--sp-border);
+  border-radius: var(--radius-sm);
+  background: var(--sp-page-bg);
+  color: var(--sp-text);
+  outline: none;
+  transition: border-color var(--transition);
+}
+
+.modal-input:focus { border-color: var(--sp-teal); }
+.modal-input::placeholder { color: #a0aec0; }
+
+.modal-btn {
+  width: 100%;
+  padding: 12px;
+  font-family: var(--font-display);
+  font-size: var(--text-sm);
+  font-weight: 600;
+  border: none;
+  border-radius: var(--radius-full);
+  background: var(--sp-teal);
+  color: var(--sp-white);
+  cursor: pointer;
+  transition: all var(--transition);
+  margin-top: 0.5rem;
+}
+
+.modal-btn:hover { background: #009199; }
+.modal-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+.modal-status {
+  margin-top: 1rem;
+  font-size: var(--text-sm);
+  text-align: center;
+  min-height: 1.5em;
+}
+
+.modal-status.success { color: #1a8754; }
+.modal-status.error { color: var(--sp-red); }
+.modal-status.loading { color: var(--sp-text-muted); }
 </style>
 </head>
 <body>
@@ -565,6 +686,7 @@ a { color: inherit; text-decoration: none; }
       <li><a href="#featured">Featured</a></li>
       <li><a href="page.html?p=wiki/index.md">Full Index</a></li>
       <li><a href="intro-to-claude-code-for-design.html">Intro Deck</a></li>
+      <li><a href="#" onclick="openIngestModal(); return false" style="color:var(--sp-teal); font-weight:500">+ Submit</a></li>
     </ul>
   </div>
 </nav>
@@ -624,50 +746,7 @@ a { color: inherit; text-decoration: none; }
     <h2 class="section-title">7 domains, one knowledge base</h2>
     <p class="section-sub">Each topic collects articles, workflows, and reference material. More articles are added as we ingest new sources.</p>
 
-    <div class="topic-grid">
-      <a href="page.html?p=wiki/figma/figma-mcp-server.md" class="topic-card fade-in">
-        <span class="topic-icon">&#9638;</span>
-        <p class="topic-name">Figma</p>
-        <p class="topic-scope">MCP server, Code Connect, design tokens, variables, component extraction</p>
-        <p class="topic-count">3 articles</p>
-      </a>
-      <div class="topic-card fade-in">
-        <span class="topic-icon">&#9881;</span>
-        <p class="topic-name">Diagrams</p>
-        <p class="topic-scope">D2, Mermaid, PlantUML, architecture diagrams, flowcharts, ERDs</p>
-        <p class="topic-count empty">Coming soon</p>
-      </div>
-      <div class="topic-card fade-in">
-        <span class="topic-icon">&#10070;</span>
-        <p class="topic-name">Visual</p>
-        <p class="topic-scope">Image generation, social cards, thumbnails, Satori, Nano Banana, icons</p>
-        <p class="topic-count empty">Coming soon</p>
-      </div>
-      <div class="topic-card fade-in">
-        <span class="topic-icon">&#9654;</span>
-        <p class="topic-name">Video</p>
-        <p class="topic-scope">Remotion, animation, motion design, video rendering pipelines</p>
-        <p class="topic-count empty">Coming soon</p>
-      </div>
-      <div class="topic-card fade-in">
-        <span class="topic-icon">&#9783;</span>
-        <p class="topic-name">Design Systems</p>
-        <p class="topic-scope">Tokens, component libraries, theme systems, accessibility, responsive</p>
-        <p class="topic-count empty">Coming soon</p>
-      </div>
-      <a href="page.html?p=wiki/tools/frontend-design-plugin.md" class="topic-card fade-in">
-        <span class="topic-icon">&#9874;</span>
-        <p class="topic-name">Tools</p>
-        <p class="topic-scope">CLIs, MCP servers, plugins, skills for design workflows</p>
-        <p class="topic-count">2 articles</p>
-      </a>
-      <a href="page.html?p=wiki/workflows/figma-to-code.md" class="topic-card fade-in">
-        <span class="topic-icon">&#10548;</span>
-        <p class="topic-name">Workflows</p>
-        <p class="topic-scope">End-to-end design patterns, tutorials, recipes combining multiple tools</p>
-        <p class="topic-count">2 articles</p>
-      </a>
-    </div>
+    <div class="topic-grid" id="topicGrid"></div>
   </div>
 </section>
 
@@ -678,26 +757,7 @@ a { color: inherit; text-decoration: none; }
     <h2 class="section-title">Start here</h2>
     <p class="section-sub">The highest-value articles in the wiki right now.</p>
 
-    <div class="featured-grid">
-      <a href="page.html?p=wiki/workflows/figma-to-code.md" class="featured-card fade-in">
-        <p class="featured-topic">Workflow</p>
-        <h3 class="featured-title">Figma to Code Workflow</h3>
-        <p class="featured-desc">How Anthropic's Design team uses Claude Code &mdash; feeding Figma designs into autonomous coding loops. The reference workflow for 2&ndash;3x productivity.</p>
-        <span class="featured-link">Read article &rarr;</span>
-      </a>
-      <a href="page.html?p=wiki/tools/frontend-design-plugin.md" class="featured-card fade-in">
-        <p class="featured-topic">Tool</p>
-        <h3 class="featured-title">Frontend Design Plugin</h3>
-        <p class="featured-desc">455K installs. The official Anthropic plugin for distinctive, production-grade UI. All the value is in the prompt engineering of one markdown file.</p>
-        <span class="featured-link">Read article &rarr;</span>
-      </a>
-      <a href="page.html?p=wiki/figma/code-connect.md" class="featured-card fade-in">
-        <p class="featured-topic">Figma</p>
-        <h3 class="featured-title">Code Connect</h3>
-        <p class="featured-desc">Maps Figma components to codebase components so the LLM uses your real design system instead of generating generic approximations.</p>
-        <span class="featured-link">Read article &rarr;</span>
-      </a>
-    </div>
+    <div class="featured-grid" id="featuredGrid"></div>
   </div>
 </section>
 
@@ -715,59 +775,92 @@ a { color: inherit; text-decoration: none; }
   </div>
 </footer>
 
+<script src="wiki-registry.js"></script>
 <script>
-// ── ARTICLE INDEX ──
-const articles = [
-  {
-    title: "Figma MCP Server",
-    topic: "figma",
-    tags: ["figma", "mcp", "integration"],
-    summary: "16-tool MCP server \u2014 setup, remote vs desktop, tool inventory, 4 context channels",
-    href: "page.html?p=wiki/figma/figma-mcp-server.md"
-  },
-  {
-    title: "Code Connect",
-    topic: "figma",
-    tags: ["figma", "code-connect", "design-system"],
-    summary: "Maps Figma components to codebase components \u2014 eliminates guesswork for LLMs",
-    href: "page.html?p=wiki/figma/code-connect.md"
-  },
-  {
-    title: "Code to Canvas",
-    topic: "figma",
-    tags: ["figma", "workflow", "bidirectional"],
-    summary: "Bidirectional workflow \u2014 code to Figma frames to collaborative design to code",
-    href: "page.html?p=wiki/figma/code-to-canvas.md"
-  },
-  {
-    title: "Frontend Design Plugin",
-    topic: "tools",
-    tags: ["plugin", "skill", "design-quality"],
-    summary: "Official Anthropic plugin (455K installs) \u2014 bold aesthetics, anti-AI-slop prompt engineering",
-    href: "page.html?p=wiki/tools/frontend-design-plugin.md"
-  },
-  {
-    title: "Distributional Convergence",
-    topic: "tools",
-    tags: ["concept", "design-quality", "llm-behavior"],
-    summary: "Why LLMs produce generic designs and the prompting altitude fix",
-    href: "page.html?p=wiki/tools/distributional-convergence.md"
-  },
-  {
-    title: "Figma to Code Workflow",
-    topic: "workflows",
-    tags: ["workflow", "figma", "design-team"],
-    summary: "Anthropic Design team's workflow \u2014 design discovery, autonomous loops, bidirectional",
-    href: "page.html?p=wiki/workflows/figma-to-code.md"
-  },
-  {
-    title: "Claude Code Best Practices",
-    topic: "workflows",
-    tags: ["workflow", "best-practices", "skills"],
-    summary: "Official practices for design \u2014 skills, subagents, context management, verification",
-    href: "page.html?p=wiki/workflows/claude-code-best-practices.md"
+// ── TOPIC METADATA ──
+var topicMeta = {
+  figma: { icon: '&#9638;', scope: 'MCP server, Code Connect, design tokens, variables, component extraction' },
+  diagrams: { icon: '&#9881;', scope: 'D2, Mermaid, PlantUML, architecture diagrams, flowcharts, ERDs' },
+  visual: { icon: '&#10070;', scope: 'Image generation, social cards, thumbnails, Satori, Nano Banana, icons' },
+  video: { icon: '&#9654;', scope: 'Remotion, animation, motion design, video rendering pipelines' },
+  'design-systems': { icon: '&#9783;', scope: 'Tokens, component libraries, theme systems, accessibility, responsive' },
+  tools: { icon: '&#9874;', scope: 'CLIs, MCP servers, plugins, skills for design workflows' },
+  workflows: { icon: '&#10548;', scope: 'End-to-end design patterns, tutorials, recipes combining multiple tools' }
+};
+
+// ── DISPLAY NAME HELPER ──
+function topicDisplayName(key) {
+  return key.split('-').map(function(w) { return w.charAt(0).toUpperCase() + w.slice(1); }).join(' ');
+}
+
+// ── RENDER TOPIC CARDS ──
+function renderTopicCards(articles) {
+  var groups = groupByTopic(articles);
+  var grid = document.getElementById('topicGrid');
+  var html = '';
+
+  var keys = Object.keys(topicMeta);
+  for (var i = 0; i < keys.length; i++) {
+    var topic = keys[i];
+    var meta = topicMeta[topic];
+    var topicArticles = groups[topic] || [];
+    var count = topicArticles.length;
+
+    if (count > 0) {
+      html += '<a href="' + topicArticles[0].href + '" class="topic-card fade-in">';
+    } else {
+      html += '<div class="topic-card fade-in">';
+    }
+
+    html += '<span class="topic-icon">' + meta.icon + '</span>';
+    html += '<p class="topic-name">' + topicDisplayName(topic) + '</p>';
+    html += '<p class="topic-scope">' + meta.scope + '</p>';
+
+    if (count > 0) {
+      html += '<p class="topic-count">' + count + ' article' + (count !== 1 ? 's' : '') + '</p>';
+      html += '</a>';
+    } else {
+      html += '<p class="topic-count empty">Coming soon</p>';
+      html += '</div>';
+    }
   }
-];
+
+  grid.innerHTML = html;
+}
+
+// ── RENDER FEATURED ARTICLES ──
+function renderFeaturedArticles(articles) {
+  var sorted = articles.slice().sort(function(a, b) {
+    return b.updated.localeCompare(a.updated);
+  });
+  var top = sorted.slice(0, 3);
+  var grid = document.getElementById('featuredGrid');
+  var html = '';
+
+  for (var i = 0; i < top.length; i++) {
+    var a = top[i];
+    html += '<a href="' + a.href + '" class="featured-card fade-in">';
+    html += '<p class="featured-topic">' + topicDisplayName(a.topic) + '</p>';
+    html += '<h3 class="featured-title">' + a.title + '</h3>';
+    html += '<p class="featured-desc">' + a.summary + '</p>';
+    html += '<span class="featured-link">Read article &rarr;</span>';
+    html += '</a>';
+  }
+
+  grid.innerHTML = html;
+}
+
+// ── ASYNC INIT ──
+var articles = [];
+
+loadRegistry().then(function(loaded) {
+  articles = loaded;
+  renderTopicCards(articles);
+  renderFeaturedArticles(articles);
+
+  // Reattach fade-in observer to dynamically rendered elements
+  document.querySelectorAll('.fade-in').forEach(function(el) { observer.observe(el); });
+});
 
 // ── SEARCH ──
 const input = document.getElementById('searchInput');
@@ -838,6 +931,79 @@ const observer = new IntersectionObserver((entries) => {
 }, { threshold: 0.15 });
 
 document.querySelectorAll('.fade-in').forEach(el => observer.observe(el));
+
+// ── INGEST MODAL ──
+function openIngestModal() {
+  document.getElementById('ingestModal').classList.add('active');
+  document.getElementById('ingestUrl').focus();
+}
+
+function closeIngestModal() {
+  document.getElementById('ingestModal').classList.remove('active');
+  document.getElementById('ingestStatus').textContent = '';
+  document.getElementById('ingestUrl').value = '';
+  document.getElementById('ingestCode').value = '';
+}
+
+async function submitIngest() {
+  var url = document.getElementById('ingestUrl').value.trim();
+  var code = document.getElementById('ingestCode').value.trim();
+  var status = document.getElementById('ingestStatus');
+  var btn = document.getElementById('ingestBtn');
+
+  if (!url) { status.textContent = 'Please enter a URL'; status.className = 'modal-status error'; return; }
+  if (!code) { status.textContent = 'Please enter the access code'; status.className = 'modal-status error'; return; }
+
+  btn.disabled = true;
+  status.textContent = 'Submitting...';
+  status.className = 'modal-status loading';
+
+  try {
+    var resp = await fetch('/api/ingest', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ url: url, code: code })
+    });
+    var data = await resp.json();
+
+    if (data.ok) {
+      status.textContent = 'Submitted! A PR will be created shortly.';
+      status.className = 'modal-status success';
+      document.getElementById('ingestUrl').value = '';
+    } else {
+      status.textContent = data.error || 'Something went wrong';
+      status.className = 'modal-status error';
+    }
+  } catch (err) {
+    status.textContent = 'Network error — try again';
+    status.className = 'modal-status error';
+  }
+
+  btn.disabled = false;
+}
 </script>
+
+<!-- ── INGEST MODAL ── -->
+<div class="modal-overlay" id="ingestModal">
+  <div class="modal">
+    <button class="modal-close" onclick="closeIngestModal()">&times;</button>
+    <p class="modal-label">Submit Source</p>
+    <h2>Add to the wiki</h2>
+    <p class="desc">Paste a URL — documentation, article, tutorial, tweet, or README. Claude will process it and create a PR with new wiki articles.</p>
+
+    <div class="modal-field">
+      <label for="ingestUrl">Source URL</label>
+      <input type="url" id="ingestUrl" class="modal-input" placeholder="https://docs.example.com/article">
+    </div>
+
+    <div class="modal-field">
+      <label for="ingestCode">Access Code</label>
+      <input type="password" id="ingestCode" class="modal-input" placeholder="Shared team code">
+    </div>
+
+    <button class="modal-btn" id="ingestBtn" onclick="submitIngest()">Submit for Ingest</button>
+    <p class="modal-status" id="ingestStatus"></p>
+  </div>
+</div>
 </body>
 </html>

@@ -17,10 +17,14 @@
 - `.claude/skills/wiki-lint/SKILL.md` — Skill: audit wiki health
 - `.claude/skills/wiki-update/SKILL.md` — Skill: revise existing wiki pages
 
-- `index.html` — Landing page for the wiki with live search, topic grid, featured articles
+- `index.html` — Landing page with dynamic registry, live search, ingest modal
+- `page.html` — Markdown article renderer with dynamic sidebar
+- `wiki-registry.js` — Shared parser for wiki/index.md (powers search, sidebar, topic cards)
+- `api/ingest.js` — Vercel serverless function: validates secret code, triggers GitHub Actions
+- `.github/workflows/wiki-ingest.yml` — CI pipeline: headless Claude wiki-ingest → PR
 - `first-list.md` — 65 curated URLs for wiki ingest, organized by learning tier and priority
 - `intro-to-claude-code-for-design.html` — 9-slide Springpod-branded intro deck for designers
-- `.claude/launch.json` — Dev server config for local preview (python3 http.server on port 8090)
+- `.claude/launch.json` — Dev server config for local preview
 
 ## Wiki Articles (11 pages)
 - `wiki/figma/figma-mcp-server.md` — 16-tool MCP server reference
@@ -42,6 +46,8 @@
 - `raw/design-systems/` — 2 files (63 design skills, design system designer workflow)
 
 ## Recent Changes
+- 2026-04-08: Self-updating wiki — dynamic registry from wiki/index.md, ingest API + GitHub Actions, submission modal
+- 2026-04-08: Created `page.html` — markdown renderer with Springpod chrome, sidebar, cross-ref resolution
 - 2026-04-08: Ingested batch 2 — designer guides, Figma deep-dives, community skills, ultimate guide
 - 2026-04-08: Ingested batch 1 — official Anthropic + Figma sources (8 raw, 7 wiki articles)
 - 2026-04-08: Created `index.html` — landing page with hero, problem section, 7-topic grid, featured articles, live search
